@@ -13,9 +13,11 @@ It searches for tool selection indicators (`SELECTED_TOOLS`, `SELECTED_TOOL`, `N
 
 ## 🚀 What is new about `llm_to_mcp_integration_engine`?
 
-The novelty lies in its **dual-listing** design:  
-MCP servers or functions are explicitly **listed in both the LLM prompt and the engine** itself.  
-This alignment ensures tool invocation is precise, structured, and validated before any action is taken—introducing a new protocol: **LLM2MCP**.
+The llm_to_mcp_integration_engine introduces a novel framework that reliably connects LLMs to MCP servers or functions—even when LLM responses are partially structured or non-JSON.
+
+It combines validation, retry mechanisms, and diagnostic controls into one programmable layer that prevents miscommunication and unsafe execution.
+
+Unlike traditional prompting tricks, this engine acts as a communication protocol, enforcing structure and decision-making integrity at runtime.
 
 ---
 
