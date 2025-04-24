@@ -16,12 +16,11 @@ class RetryHandler:
 
     def should_retry(self, error: Exception) -> bool:
         """Decide whether to retry based on the error."""
-        # TODO: Implement retry logic based on the error type
-        return False
+        from .exceptions import IntegrationError
+        return isinstance(error, IntegrationError)
 
     def build_retry_prompt(self, base: str, retry_prompt: str) -> str:
         """Build a refined prompt for the next retry attempt."""
-        # TODO: Implement logic to build a refined prompt
         return base + " " + retry_prompt
 
     def next_model(self):
