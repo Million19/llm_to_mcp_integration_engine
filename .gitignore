@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+# context
+
 # Distribution / packaging
 .Python
 env/
@@ -108,3 +110,4 @@ ENV/
 .vscode/
 .idea/
 
+.aider*
