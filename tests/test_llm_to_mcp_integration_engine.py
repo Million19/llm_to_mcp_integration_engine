@@ -1,5 +1,5 @@
 import pytest
-from src.llm_to_mcp_integration_engine.llm_to_mcp_integration_engine import llm_to_mcp_integration_advance
+from src.llm_to_mcp_integration_engine.llm_to_mcp_integration_engine import llm_to_mcp_integration_advance, llm_to_mcp_integration_default, llm_to_mcp_integration_custom
 from src.llm_to_mcp_integration_engine.exceptions import InvalidFormatError, RetryLimitExceededError
 
 def test_pure_json_valid_selected_tools_case():
@@ -95,3 +95,55 @@ def test_actual_chaining_of_two_mock_tools():
     }
     result = llm_to_mcp_integration_advance(tools_list, llm_response, True, False, False)
     assert result == {"success": True, "results": ['Tool 1 executed with params: {\'param1\': \'value1\'}', 'Tool 2 executed with params: {\'param3\': True}}']}
+
+def test_default_selected_tool_single_call():
+    # Given
+    tools_list = {"PingTool": [{"name": "param1", "type": "str"}]}
+    llm_response = {
+        "SELECTED_TOOL": {
+            "name": "PingTool",
+            "parameters": {"param1": "hello"}
+        }
+    }
+
+    # When
+    result = llm_to_mcp_integration_default(tools_list, llm_response, json_validation=True)
+
+    # Then
+    assert result == {"success": True, "results": ["Tool 1 executed with params: {'param1': 'hello'}"]}
+
+def test_default_rejects_no_tools_selected():
+    tools_list = {}
+    llm_response = {"NO_TOOLS_SELECTED": True}
+    with pytest.raises(InvalidFormatError):
+        llm_to_mcp_integration_default(tools_list, llm_response, json_validation=True)
+
+def test_default_multiple_directives_error():
+    tools_list = {}
+    llm_response = {
+        "SELECTED_TOOL": {"name": "PingTool", "parameters": {"param1": "hello"}},
+        "NO_TOOLS_SELECTED": True
+    }
+    with pytest.raises(InvalidFormatError):
+        llm_to_mcp_integration_default(tools_list, llm_response, json_validation=True)
+
+def test_custom_html_param():
+    tools_list = {
+        "RenderHTML": [{"name": "html", "type": "str"}]
+    }
+    llm_response = {
+        "SELECTED_TOOL": {
+            "name": "RenderHTML",
+            "parameters": {"html": "<div>Hello</div>"}
+        }
+    }
+
+    result = llm_to_mcp_integration_custom(tools_list, llm_response, json_validation=True)
+
+    assert result == {"success": True, "results": ["Tool 1 executed with params: {'html': '<div>Hello</div>'}"]}
+
+def test_custom_supports_no_tools_selected():
+    tools_list = {}
+    llm_response = {"NO_TOOLS_SELECTED": True}
+    result = llm_to_mcp_integration_custom(tools_list, llm_response, json_validation=True)
+    assert result == {"success": True, "results": []}
