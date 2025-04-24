@@ -27,11 +27,20 @@ This alignment ensures tool invocation is precise, structured, and validated bef
 
 ---
 
-## ❌ Is there an existing communication layer?
+ ## ❌ Is there an existing communication layer?
 
 **No.**  
-This is a **novel invention**. We introduced the **LLM2MCP protocol**, a first-of-its-kind communication layer where LLMs are required to **embed tool selections as JSON** using strict keywords.  
-The tools/functions are listed in both the LLM prompt and the engine for validation—an entirely **new approach**.
+This is a **novel invention**. We introduced the **LLM2MCP protocol**, a first-of-its-kind communication framework that connects LLMs to MCP servers or functions in a **structured, validated, and controllable** way.  
+
+What makes it new:
+
+- **Dual Registration**: Tools/functions are listed in both the LLM prompt and the engine, ensuring alignment and consistency.
+- **Non-JSON Tolerance**: Even when the LLM response is not fully JSON, the engine can still extract valid tool selections using regex and logic-based checks.
+- **Retry Framework**: If validation fails (missing tools, incorrect formats, etc.), the engine can retry with a new prompt or even switch to a different LLM.
+- **Fine-Grained Failure Detection**: Developers can diagnose exactly where the LLM fails — whether in selecting the right tool, formatting parameters, or transitioning to tool execution.
+- **Execution Safety**: The engine ensures no tool or MCP server is called unless the response is valid and verified.
+
+This bundling of validation, fallbacks, control logic, and robustness into a **single integration engine** is what makes it a **new invention**.
 
 ---
 
