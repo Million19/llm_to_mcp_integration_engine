@@ -48,11 +48,26 @@ def llm_to_mcp_integration_custom(
     It lets users override tool param parsing (e.g. parse a mini-language or special DSL).
     It may also allow function-based callbacks instead of HTTP-based tools in the future.
     """
-    return integration_advance(
-        tools_list=tools_list,
-        llm_response=llm_response,
-        json_validation=json_validation,
-        no_tools_selected=True,  # enable this if agent might not call tools
-        multi_stage_tools_select=True  # allow multi-step behaviors
-    )
+    if not json_validation:
+        parsed_results = {}
+        for tool in tools_list:
+            tool_name = tool["name"]
+            pattern = tool["pattern"]
+            capture_group = tool.get("capture_group", 0)  # Default to 0 if not provided
+
+            match = pattern.search(llm_response)
+            if match:
+                parsed_results[tool_name] = match.group(capture_group)
+            else:
+                parsed_results[tool_name] = None  # Or raise an exception if no match is an error
+
+        return parsed_results
+    else:
+        return integration_advance(
+            tools_list=tools_list,
+            llm_response=llm_response,
+            json_validation=json_validation,
+            no_tools_selected=True,  # enable this if agent might not call tools
+            multi_stage_tools_select=True  # allow multi-step behaviors
+        )
     # TODO: Add a custom parsing/validation plugin in the future.

@@ -16,9 +16,21 @@ def integration_advance(
             is_json = is_response_json(llm_response)
             if is_json:
                 directive = find_tools_in_json(llm_response)
-            else:
-                fragment = extract_json_fragment(llm_response)
-                directive = find_tools_in_text(fragment)
+            else: # llm_response is a string in this path
+                if not isinstance(llm_response, str):
+                    # This safeguard helps catch unexpected types.
+                    # Given the logic of is_response_json, llm_response should be a string here.
+                    raise IntegrationError(f"Expected llm_response to be a string, but got {type(llm_response)}")
+                
+                # Call find_tools_in_text with the original string response.
+                # find_tools_in_text itself is responsible for finding and parsing the JSON fragment within this string.
+                # It returns a tuple: (directive_key, parsed_json_dictionary_from_fragment)
+                # The original code assigned to 'directive', likely expecting the directive key.
+                _directive_key, _parsed_data_from_fragment = find_tools_in_text(llm_response)
+                directive = _directive_key 
+                # Note: Subsequent code in integration_advance that needs to parse the tool details
+                # (e.g., the commented out `parse_selected_tools`) should use `_parsed_data_from_fragment`
+                # as the input dictionary, not the original `llm_response` string.
             # validate directive and CoT
             # parse steps
             # steps = parse_selected_tools(llm_response)  # or other
